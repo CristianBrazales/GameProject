@@ -8,16 +8,13 @@
 
 #include "Game.hpp"
 #include "TextureManager.hpp"
-#include "GameObject.hpp"
 #include "Map.hpp"
-#include "ECS.hpp"
-#include "Components.hpp"
-GameObject *player;
-GameObject *enemy;
+#include "ECS/Components.hpp"
 SDL_Renderer * Game::renderer=nullptr;
 Map* map;
+
 Manager manager;
-auto& newPlayer (manager.addEntity());
+auto& player (manager.addEntity());
 
 
 
@@ -57,12 +54,10 @@ void Game::init(const char *title, int xpos,int ypos, int width, int height,bool
     }else{
         isRunning=false;
     }
-    player = new GameObject("mono.png",0,0);
-    enemy= new GameObject("enemy.png",400,0);
+  
     map = new Map();
-    newPlayer.addComponent<PositionComponet>();
-    newPlayer.addComponent<PositionComponet>().setPos(500, 500);
- 
+    player.addComponent<PositionComponent>(0,0);
+    player.addComponent<SpriteComponent>("mono.png");
 }
 void Game::handleEvents(){
     SDL_Event event;
@@ -78,22 +73,17 @@ void Game::handleEvents(){
     
 }
 void Game::update(){
-    // update all objects from here aim to keep object separate
-    player->Update();
-    enemy->Update();
+    manager.refresh();
     manager.update();
-    std::cout<<newPlayer.getComponent<PositionComponet>().x()<<","<<
-    newPlayer.getComponent<PositionComponet>().y()<<std::endl;
-    
-    
+    if(player.getComponent<PositionComponent>().x()>100)
+        player.getComponent<SpriteComponent>().setTex("enemy.png");
+
 }
 void Game::render(){
     SDL_RenderClear(renderer);
      map->DrawMap();
     // place to add more renderization
-    player->Render();
-   
-    enemy->Render();
+    manager.draw();  
     SDL_RenderPresent(renderer);
     
     
