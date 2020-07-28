@@ -7,13 +7,16 @@
 //
 
 #include "Game.hpp"
+#include <iostream>
 #include "TextureManager.hpp"
 #include "Map.hpp"
 #include "ECS/Components.hpp"
+#include "Vector2D.hpp"
+
 SDL_Renderer * Game::renderer=nullptr;
 Map* map;
-
 Manager manager;
+SDL_Event Game::event;
 auto& player (manager.addEntity());
 
 
@@ -56,11 +59,13 @@ void Game::init(const char *title, int xpos,int ypos, int width, int height,bool
     }
   
     map = new Map();
-    player.addComponent<PositionComponent>(0,0);
+    player.addComponent<TransformComponent>(0,0);
     player.addComponent<SpriteComponent>("mono.png");
+    player.addComponent<KeyboardController>();
 }
 void Game::handleEvents(){
-    SDL_Event event;
+ 
+    
     SDL_PollEvent(&event);
     switch (event.type){
         case SDL_QUIT:
@@ -75,8 +80,7 @@ void Game::handleEvents(){
 void Game::update(){
     manager.refresh();
     manager.update();
-    if(player.getComponent<PositionComponent>().x()>100)
-        player.getComponent<SpriteComponent>().setTex("enemy.png");
+   
 
 }
 void Game::render(){
